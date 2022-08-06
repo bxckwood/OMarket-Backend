@@ -1,0 +1,57 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+    id            Int      @id @default(autoincrement())
+    country       String   @db.VarChar(30)
+    createdAt     DateTime @default(now())
+    email         String   @unique @db.VarChar(20)
+    name          String   @db.VarChar(30)
+    password      String   
+    address       String   @db.VarChar(50)
+    all_addresses String[] 
+    phone         String
+    orders        Order[]  
+    cart          Cart?   
+    role          Role     @default(USER)
+}
+
+model Cart {
+    id       Int       @id @default(autoincrement())
+    userId   Int       @unique
+    user     User      @relation(fields: [userId], references: [id])
+    products Product[]
+}
+
+model Product {
+    id       Int     @id @default(autoincrement())
+    name     String
+    provider String
+    size     String
+    price    Int
+    discount Int
+    rating   Int
+    cart     Cart[]
+    orders   Order[]
+    orderId  Int?
+    category String
+}
+
+model Order {
+    id       Int       @id @default(autoincrement())
+    userId   Int
+    user     User      @relation(fields: [userId], references: [id])
+    products Product[]
+    address  String
+}
+
+enum Role {
+    USER
+    ADMIN
+}
